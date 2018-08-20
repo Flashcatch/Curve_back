@@ -1,0 +1,100 @@
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="mappers.AppointmentMapper">
+
+    <resultMap id="appointmentMap" type="domain.Appointment">
+        <id property="id" column="appointment_id"/>
+        <result property="type" column="appointment_type"/>
+        <result property="startTime" column="appointment_start_time"/>
+        <result property="duration" column="appointment_duration"/>
+        <association property="patient" resultMap="mappers.PatientMapper.patientMap"/>
+        <association property="blockBooking" resultMap="mappers.BlockBookingMapper.blockBookingMap"/>
+    </resultMap>
+
+    <sql id="appointmentCols">
+        ${appointment_alias}.id as appointment_id,
+        ${appointment_alias}.type as appointment_type,
+        ${appointment_alias}.starttime as appointment_start_time,
+        ${appointment_alias}.duration as appointment_duration
+    </sql>
+
+    <select id="selectAllAppointments" resultMap="appointmentMap">
+        SELECT
+        <include refid="appointmentCols">
+            <property name="appointment_alias" value="a"/>
+        </include>
+        ,
+        <include refid="mappers.PatientMapper.patientCols">
+            <property name="patient_alias" value="p"/>
+        </include>
+        ,
+        <include refid="mappers.BlockBookingMapper.blockBookingCols">
+            <property name="blockbooking_alias" value="b"/>
+        </include>
+        FROM appointments a
+             left join patients p on (a.patient_id = p.id)
+        left join blockbookings b on (a.blockbooking_id = b.id)
+        WHERE 1=1
+        <if test="startDate != null">
+            AND date_trunc('day', a.starttime) = to_timestamp(#{startDate},'YYYY-MM-DD')
+        </if>
+    </select>
+
+    <select id="selectAppointmentById" resultMap="appointmentMap">
+        SELECT
+        <include refid="appointmentCols">
+            <property name="appointment_alias" value="a"/>
+        </include>
+        ,
+        <include refid="mappers.PatientMapper.patientCols">
+            <property name="patient_alias" value="p"/>
+        </include>
+        ,
+        <include refid="mappers.BlockBookingMapper.blockBookingCols">
+            <property name="blockbooking_alias" value="b"/>
+        </include>
+        FROM appointments a
+        left join patients p on (a.patient_id = p.id)
+        left join blockbookings b on (a.blockbooking_id = b.id)
+        WHERE a.id = #{id}
+    </select>
+
+    <insert id="insertAppointment" useGeneratedKeys="true" keyColumn="id" keyProperty="id">
+        INSERT INTO appointments (
+          type,
+          starttime,
+          duration,
+          patient_id,
+          blockbooking_id
+          )
+        VALUES (
+          #{type},
+          #{startTime},
+          #{duration},
+          #{patient.id},
+          #{blockBooking.id}
+        )
+    </insert>
+    
+    <update id="updateAppointment">
+        UPDATE appointments
+        SET starttime = #{startTime},
+            duration = #{duration}
+        WHERE id = #{id}
+    </update>
+
+    <delete id="deleteAppointment">
+        delete from appointments where id = #{id}
+    </delete>
+
+    <select id="selectAppointmentsByInterval" resultType="int">
+        select count (1)
+        from appointments
+        where starttime <![CDATA[ <= ]]> (to_timestamp(#{startDate}, 'YYYY-MM-DD HH24:MI:SS') + (#{duration}||' minutes')::INTERVAL)
+        and (starttime + (duration||' minutes')::INTERVAL) >=to_timestamp(#{startDate}, 'YYYY-MM-DD HH24:MI:SS')
+        </select>
+    
+    <delete id="deleteAppointmentsByBookingId">
+        delete from appointments where blockbooking_id = #{id}
+    </delete>
+
+</mapper>

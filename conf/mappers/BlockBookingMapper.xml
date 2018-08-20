@@ -1,0 +1,78 @@
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="mappers.BlockBookingMapper">
+
+    <resultMap id="blockBookingMap" type="domain.BlockBooking">
+        <id property="id" column="blockbooking_id"/>
+        <result property="description" column="blockbooking_description"/>
+        <result property="startTime" column="blockbooking_starttime"/>
+        <result property="finishTime" column="blockbooking_finishtime"/>
+        <result property="duration" column="blockbooking_duration"/>
+        <result property="recurType" column="blockbooking_recurtype"/>
+    </resultMap>
+
+    <sql id="blockBookingCols">
+        ${blockbooking_alias}.id as blockbooking_id,
+        ${blockbooking_alias}.description as blockbooking_description,
+        ${blockbooking_alias}.starttime as blockbooking_startTime,
+        ${blockbooking_alias}.finishtime as blockbooking_finishTime,
+        ${blockbooking_alias}.duration as blockbooking_duration,
+        ${blockbooking_alias}.recurtype as blockbooking_recurtype
+    </sql>
+
+    <select id="selectAllBlockBookings" resultMap="blockBookingMap">
+        SELECT
+        <include refid="blockBookingCols">
+            <property name="blockbooking_alias" value="b"/>
+        </include>
+        FROM blockbookings b
+    </select>
+
+    <select id="selectBlockBookingById" resultMap="blockBookingMap">
+        SELECT
+        <include refid="blockBookingCols">
+            <property name="blockbooking_alias" value="b"/>
+        </include>
+        FROM blockbookings b
+        WHERE b.id = #{id}
+    </select>
+
+    <insert id="insertBlockBooking" useGeneratedKeys="true" keyColumn="id" keyProperty="id">
+        INSERT INTO blockbookings (
+          description,
+          starttime,
+          finishtime,
+          duration,
+          recurtype
+          )
+        VALUES (
+          #{description},
+          #{startTime},
+          #{finishTime},
+          #{duration},
+          #{recurType}
+        )
+    </insert>
+
+    <update id="updateBlockBooking">
+        UPDATE blockbookings
+        SET description = #{description},
+            starttime = #{startTime},
+            finishtime = #{finishTime},
+            duration = #{duration},
+            recurtype = #{recurType}
+        where id = #{id}
+
+    </update>
+
+    <delete id="deleteBlockBooking">
+        DELETE FROM blockbookings WHERE id = #{id}
+    </delete>
+
+    <update id="setRecurType">
+        update blockbookings set recurtype = #{recurType} where id = #{id}
+    </update>
+
+    <select id="getRecurType" resultType="java.lang.String">
+        select recurtype from blockbookings where id = #{id}
+    </select>
+</mapper>

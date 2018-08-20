@@ -1,0 +1,27 @@
+GET           /docs/                      controllers.Assets.at(path="/public/swagger-ui",file="index.html")
+GET           /docs/swagger.json          controllers.ApiHelpController.getResources
+GET           /docs/*file                 controllers.Assets.at(path="/public/swagger-ui",file)
+
+GET           /                           controllers.HomeController.index()
+
+# Patients
+GET           /v1/patients                controllers.PatientController.getPatients
+GET           /v1/patients/:id            controllers.PatientController.getPatientById(id: Long)
+POST          /v1/patients                controllers.PatientController.addPatient()
+PUT           /v1/patients/:id            controllers.PatientController.updatePatientById(id: Long)
+DELETE        /v1/patients/:id            controllers.PatientController.deletePatientById(id: Long)
+
+# Appointments
+GET           /v1/appointments            controllers.AppointmentController.getAppointments
+GET           /v1/appointments/:id        controllers.AppointmentController.getAppointmentById(id: Long)
+POST          /v1/appointments            controllers.AppointmentController.addAppointment()
+PUT           /v1/appointments/:id        controllers.AppointmentController.updateAppointmentById(id: Long)
+DELETE        /v1/appointments/:id        controllers.AppointmentController.deleteAppointmentById(id: Long)
+
+# BlockBookings
+GET           /v1/blockbookings            controllers.BlockBookingController.getBlockBookings
+GET           /v1/blockbookings/:id        controllers.BlockBookingController.getBlockBookingById(id: Long)
+POST          /v1/blockbookings            controllers.BlockBookingController.addBlockBooking()
+PUT           /v1/blockbookings/:id        controllers.BlockBookingController.updateBlockBookingById(id: Long)
+DELETE        /v1/blockbookings/:id        controllers.BlockBookingController.deleteBlockBookingById(id: Long)
+

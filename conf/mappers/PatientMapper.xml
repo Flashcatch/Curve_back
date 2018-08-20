@@ -1,0 +1,59 @@
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="mappers.PatientMapper">
+
+    <resultMap id="patientMap" type="domain.Patient">
+        <id property="id" column="patient_id"/>
+        <result property="firstName" column="patient_first_name"/>
+        <result property="lastName" column="patient_last_name"/>
+        <result property="birthdate" column="patient_birthdate"/>
+    </resultMap>
+
+    <sql id="patientCols">
+        ${patient_alias}.id as patient_id,
+        ${patient_alias}.firstname as patient_first_name,
+        ${patient_alias}.lastname as patient_last_name,
+        ${patient_alias}.birthdate as patient_birthdate
+    </sql>
+
+    <select id="selectAllPatients" resultMap="patientMap">
+        SELECT
+        <include refid="patientCols">
+            <property name="patient_alias" value="p"/>
+        </include>
+        FROM patients p
+    </select>
+
+    <select id="selectPatientById" resultMap="patientMap">
+        SELECT
+        <include refid="patientCols">
+            <property name="patient_alias" value="p"/>
+        </include>
+        FROM patients p
+        WHERE p.id = #{id}
+    </select>
+
+    <insert id="insertPatient" useGeneratedKeys="true" keyColumn="id" keyProperty="id">
+        INSERT INTO patients (
+          firstname,
+          lastname,
+          birthdate
+          )
+        VALUES (
+          #{firstName},
+          #{lastName},
+          #{birthdate}
+        )
+    </insert>
+
+    <update id="updatePatient">
+        UPDATE patients
+        SET firstname = #{firstName},
+            lastname = #{lastName},
+            birthdate = #{birthdate}
+        where id = #{id}
+    </update>
+
+    <delete id="deletePatient">
+        DELETE FROM patients WHERE id = #{id}
+    </delete>
+</mapper>
